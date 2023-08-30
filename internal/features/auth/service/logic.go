@@ -14,22 +14,19 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type service struct {
 	userRepo user.RepositoryInterface
 	validate *validator.Validate
-	db       *gorm.DB
 	redis    *redis.Client
 }
 
-func New(repoUser user.RepositoryInterface, Db *gorm.DB, Redis *redis.Client) auth.ServiceInterface {
+func New(repoUser user.RepositoryInterface, Redis *redis.Client) auth.ServiceInterface {
 	return &service{
 		userRepo: repoUser,
 		validate: vald.NewValidator(),
 		redis:    Redis,
-		db:       Db,
 	}
 }
 
@@ -46,7 +43,7 @@ func (s *service) Login(inputData auth.LoginRequest, c echo.Context) (*auth.Logi
 	if errFindByEmail != nil && errFindByEmail.Error() != "record not found" {
 		return nil, "Error query FindByEmailUser.", http.StatusInternalServerError, errFindByEmail
 	} else if errFindByEmail != nil && errFindByEmail.Error() == "record not found" {
-		return nil, "Error, your email entered didn't match", http.StatusBadRequest, errFindByEmail
+		return nil, "Error, your email entered didn't match or user deactivated", http.StatusBadRequest, errFindByEmail
 	}
 
 	if errCheckPassword := bcrypt.CompareHashAndPassword([]byte(dataUser.UserPassword), []byte(*inputData.UserPassword)); errCheckPassword != nil {

@@ -3,6 +3,7 @@ package delivery
 import (
 	"net/http"
 	"rentbook/internal/features/auth"
+	"rentbook/internal/middleware"
 	"rentbook/utils/helper"
 
 	"github.com/labstack/echo/v4"
@@ -18,7 +19,7 @@ func New(service auth.ServiceInterface, e *echo.Echo) {
 	}
 	g := e.Group("/auth")
 	g.POST("/login", handler.Login)
-	g.POST("/logout", handler.Logout)
+	g.POST("/logout", handler.Logout, middleware.JWTMiddleware())
 }
 
 func (d *delivery) Login(c echo.Context) error {

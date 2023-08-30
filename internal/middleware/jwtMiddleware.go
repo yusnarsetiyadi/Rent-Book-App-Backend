@@ -74,40 +74,6 @@ func GenerateRefreshToken(token auth.Token) (auth.Token, error) {
 	return token, nil
 }
 
-func ValidateRefreshToken(token auth.Token) error {
-	sha1 := sha1.New()
-	io.WriteString(sha1, config.GetConfig().JWT_SECRET)
-
-	salt := string(sha1.Sum(nil))[0:16]
-	block, err := aes.NewCipher([]byte(salt))
-	if err != nil {
-		return err
-	}
-
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return err
-	}
-
-	data, err := base64.URLEncoding.DecodeString(token.RefreshToken)
-	if err != nil {
-		return err
-	}
-
-	nonceSize := gcm.NonceSize()
-	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
-	plain, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return err
-	}
-
-	if string(plain) != token.AccessToken {
-		return errors.New("invalid token")
-	}
-
-	return nil
-}
-
 func ExtractTokenClaimString(e echo.Context, field string) string {
 	parsedToken, err := jwt.Parse(Token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(key), nil

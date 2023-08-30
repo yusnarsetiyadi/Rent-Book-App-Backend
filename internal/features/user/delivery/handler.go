@@ -3,6 +3,7 @@ package delivery
 import (
 	"net/http"
 	"rentbook/internal/features/user"
+	"rentbook/internal/middleware"
 	"rentbook/utils/helper"
 
 	"github.com/labstack/echo/v4"
@@ -18,11 +19,11 @@ func New(service user.ServiceInterface, e *echo.Echo) {
 	}
 	g := e.Group("/users")
 	g.POST("", handler.Create)
-	g.GET("/:id", handler.GetById)
-	g.GET("", handler.GetAll)
-	g.PUT("/:id", handler.Update)
-	g.PATCH("/:id", handler.Delete)
-	g.PATCH("/change_password/:id", handler.ChangePassword)
+	g.GET("/:id", handler.GetById, middleware.JWTMiddleware())
+	g.GET("", handler.GetAll, middleware.JWTMiddleware())
+	g.PUT("/:id", handler.Update, middleware.JWTMiddleware())
+	g.PATCH("/:id", handler.Delete, middleware.JWTMiddleware())
+	g.PATCH("/change_password/:id", handler.ChangePassword, middleware.JWTMiddleware())
 }
 
 func (d *delivery) Create(c echo.Context) error {

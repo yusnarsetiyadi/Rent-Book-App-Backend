@@ -16,21 +16,18 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type service struct {
 	userRepo user.RepositoryInterface
 	validate *validator.Validate
-	db       *gorm.DB
 	redis    *redis.Client
 }
 
-func New(repoUser user.RepositoryInterface, Db *gorm.DB, Redis *redis.Client) user.ServiceInterface {
+func New(repoUser user.RepositoryInterface, Redis *redis.Client) user.ServiceInterface {
 	return &service{
 		userRepo: repoUser,
 		validate: vald.NewValidator(),
-		db:       Db,
 		redis:    Redis,
 	}
 }
@@ -206,6 +203,11 @@ func (s *service) Update(inputData *user.UpdateRequest, e echo.Context) (*user.U
 func (s *service) Delete(inputData *user.DeleteRequest, e echo.Context) (*user.DeleteResponse, string, int, error) {
 	var result user.DeleteResponse
 
+	errValidate := s.validate.Struct(inputData)
+	if errValidate != nil {
+		return nil, "Error Validate input data, check required field", http.StatusBadRequest, errValidate
+	}
+
 	userData, errGetUser := s.userRepo.GetById(inputData.Id)
 	if errGetUser != nil {
 		return nil, "Error query GetUser", http.StatusInternalServerError, errGetUser
@@ -230,6 +232,11 @@ func (s *service) Delete(inputData *user.DeleteRequest, e echo.Context) (*user.D
 func (s *service) ChangePassword(inputData *user.ChangePasswordRequest, e echo.Context) (*user.ChangePasswordResponse, string, int, error) {
 	var result user.ChangePasswordResponse
 	var data = new(user.Users)
+
+	errValidate := s.validate.Struct(inputData)
+	if errValidate != nil {
+		return nil, "Error Validate input data, check required field", http.StatusBadRequest, errValidate
+	}
 
 	userData, errGetUser := s.userRepo.GetByIdOnly(inputData.Id)
 	if errGetUser != nil {
