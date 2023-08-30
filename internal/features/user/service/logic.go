@@ -132,16 +132,12 @@ func (s *service) GetAll(e echo.Context) (*user.GetAllResponse, string, int, err
 		return nil, "Error query GetCount", http.StatusInternalServerError, errGetCount
 	}
 
-	result = &user.GetAllResponse{
-		Data:  *data,
-		Count: count,
-	}
-
 	keyRedis := "save_temporary_data"
 	_, errDel := s.redis.Del(keyRedis).Result()
 	if errDel != nil {
-		logrus.Info("Error delete data redis")
+		logrus.Error("Error delete data redis")
 	}
+	logrus.Info("Success Delete Redis Temporary Data Previously")
 
 	dataResult, errMarshalData := json.Marshal(data)
 	if errMarshalData != nil {
@@ -151,6 +147,21 @@ func (s *service) GetAll(e echo.Context) (*user.GetAllResponse, string, int, err
 	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 24*time.Hour).Err()
 	if errSaveDataRedis != nil {
 		return nil, "Error save temporary data to redis", http.StatusInternalServerError, errSaveDataRedis
+	}
+	logrus.Info("Success Save Redis Temporary Data")
+
+	dataRedisTemporary, errGetDataRedis := s.redis.Get(keyRedis).Result()
+	if errGetDataRedis == redis.Nil {
+		logrus.Error("Data Redis Temporary Data not found.")
+	} else if errGetDataRedis != nil {
+		logrus.Error("Error Get Redis Temporary Data not found")
+	} else {
+		logrus.Print("Redis Temporary Data: " + dataRedisTemporary)
+	}
+
+	result = &user.GetAllResponse{
+		Data:  *data,
+		Count: count,
 	}
 
 	return result, "Success GetAll & GetCount User", http.StatusOK, nil
