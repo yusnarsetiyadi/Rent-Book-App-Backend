@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"rentbook/internal/features/auth"
@@ -69,6 +70,9 @@ func (s *service) Login(inputData auth.LoginRequest, c echo.Context) (*auth.Logi
 	}
 
 	keyRedis := middleware.ExtractTokenMapClaim(c, "userId")
+	if keyRedis == "" {
+		return nil, "Error Claim redis key (user id) from token, please login.", http.StatusForbidden, errors.New("error claim user id")
+	}
 	timeCreated := general.DateTodayLocal().String()
 	dataRedisSave := fmt.Sprintf("Event Created for Login user=%s(id=%s) at %s", dataUser.UserEmail, dataUser.UserId, timeCreated)
 	_, errCreateEvent := s.redis.LPush(keyRedis.(string), dataRedisSave).Result()
@@ -106,6 +110,9 @@ func (s *service) Logout(c echo.Context) (*auth.LogoutResponse, string, int, err
 	}
 
 	keyRedis := middleware.ExtractTokenMapClaim(c, "userId")
+	if keyRedis == "" {
+		return nil, "Error Claim redis key (user id) from token, please login.", http.StatusForbidden, errors.New("error claim user id")
+	}
 	dataRedisEvent, errGetEventRedis := s.redis.LPop(keyRedis.(string)).Result()
 	if errGetEventRedis == redis.Nil {
 		logrus.Error("Data Redis Event not found. on user=" + keyRedis.(string))

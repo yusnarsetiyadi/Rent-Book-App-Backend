@@ -144,7 +144,7 @@ func (s *service) GetAllByIdUser(inputData *book.GetAllByIdUserRequest, e echo.C
 		return nil, "Error marshal data for save temporary redis", http.StatusInternalServerError, errMarshalData
 	}
 	dataRedisSave := fmt.Sprintf("Query Get All By Id User & Get Count By Id User with data= %s \ncount= %d \nparam user_name= %s \nparam book_name= %s \nparam book_publisher= %s \nparam book_author= %s", string(dataResult), *count, queryParam["user_name"], queryParam["book_name"], queryParam["book_publisher"], queryParam["book_author"])
-	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 24*time.Hour).Err()
+	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 1*time.Hour).Err()
 	if errSaveDataRedis != nil {
 		return nil, "Error save temporary data to redis", http.StatusInternalServerError, errSaveDataRedis
 	}

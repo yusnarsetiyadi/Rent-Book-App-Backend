@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 func GenerateUUID() string {
@@ -62,4 +63,12 @@ func GeneratePassword(passwordLength, minSpecialChar, minNum, minUpperCase, minL
 func DateTodayLocal() *time.Time {
 	now := time.Now().UTC().Add(time.Hour * 7)
 	return &now
+}
+
+func ParseStringToTime(date string) time.Time {
+	parsedTime, err := time.Parse("2006-01-02 15:04:05", date)
+	if err != nil {
+		logrus.Error("Error Parse String To Time")
+	}
+	return parsedTime.UTC()
 }
