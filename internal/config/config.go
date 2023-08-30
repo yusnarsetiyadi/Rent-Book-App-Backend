@@ -24,6 +24,11 @@ type AppConfig struct {
 	REDIS_PORT     int
 	REDIS_USER     string
 	REDIS_PASSWORD string
+	SMTP_HOST      string
+	SMTP_PORT      uint
+	SENDER_NAME    string
+	AUTH_EMAIL     string
+	AUTH_PASSWORD  string
 }
 
 var lock = &sync.Mutex{}
@@ -88,5 +93,15 @@ func initConfig() *AppConfig {
 	defaultConfig.REDIS_PORT = cnvRedisPort
 	defaultConfig.REDIS_USER = os.Getenv("REDIS_USER")
 	defaultConfig.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
+	defaultConfig.SMTP_HOST = os.Getenv("SMTP_HOST")
+	cnvSmtpPort, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	if err != nil {
+		log.Fatal("Cannot parse SMTP Port variable")
+		return nil
+	}
+	defaultConfig.SMTP_PORT = uint(cnvSmtpPort)
+	defaultConfig.SENDER_NAME = os.Getenv("SENDER_NAME")
+	defaultConfig.AUTH_EMAIL = os.Getenv("AUTH_EMAIL")
+	defaultConfig.AUTH_PASSWORD = os.Getenv("AUTH_PASSWORD")
 	return &defaultConfig
 }
