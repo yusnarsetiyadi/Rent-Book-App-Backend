@@ -68,16 +68,16 @@ func (s *service) Login(inputData auth.LoginRequest, c echo.Context) (*auth.Logi
 		return nil, "Error, failed generate refresh token.", http.StatusInternalServerError, errRefreshToken
 	}
 
-	keyRedis := middleware.ExtractTokenClaimStringFromToken(c, "userId", fullToken.AccessToken)
+	keyRedis := middleware.ExtractTokenMapClaim(c, "userId")
 	timeCreated := general.DateTodayLocal().String()
 	dataRedisSave := fmt.Sprintf("Event Created for Login user=%s(id=%s) at %s", dataUser.UserEmail, dataUser.UserId, timeCreated)
-	_, errCreateEvent := s.redis.LPush(keyRedis, dataRedisSave).Result()
+	_, errCreateEvent := s.redis.LPush(keyRedis.(string), dataRedisSave).Result()
 	if errCreateEvent != nil {
 		return nil, "Error save event data to redis", http.StatusInternalServerError, errCreateEvent
 	}
 	logrus.Info("Success Save Redis Event Data")
 
-	dataEventRedis, errGetEventRedis := s.redis.LRange(keyRedis, 0, -1).Result()
+	dataEventRedis, errGetEventRedis := s.redis.LRange(keyRedis.(string), 0, -1).Result()
 	if errGetEventRedis != nil {
 		logrus.Error("Error Get Redis Event Data")
 	} else {
@@ -105,10 +105,10 @@ func (s *service) Logout(c echo.Context) (*auth.LogoutResponse, string, int, err
 		return nil, "Error Change Logout Token.", http.StatusInternalServerError, errTokenLogout
 	}
 
-	keyRedis := middleware.ExtractTokenClaimString(c, "userId")
-	dataRedisEvent, errGetEventRedis := s.redis.LPop(keyRedis).Result()
+	keyRedis := middleware.ExtractTokenMapClaim(c, "userId")
+	dataRedisEvent, errGetEventRedis := s.redis.LPop(keyRedis.(string)).Result()
 	if errGetEventRedis == redis.Nil {
-		logrus.Error("Data Redis Event not found. on user=" + keyRedis)
+		logrus.Error("Data Redis Event not found. on user=" + keyRedis.(string))
 	} else if errGetEventRedis != nil {
 		logrus.Error("Error Get Redis Event Data not found")
 	} else {

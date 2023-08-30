@@ -20,8 +20,6 @@ import (
 )
 
 var key string
-var Token string
-var err error
 
 func InitJWT(c *config.AppConfig) {
 	key = c.JWT_SECRET
@@ -44,8 +42,7 @@ func GenerateAccessToken(user *auth.Auth) (string, error) {
 		"exp":        time.Now().Add(time.Hour * 48).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	Token, err = token.SignedString([]byte(key))
-	return Token, err
+	return token.SignedString([]byte(key))
 }
 
 func GenerateRefreshToken(token auth.Token) (auth.Token, error) {
@@ -74,8 +71,14 @@ func GenerateRefreshToken(token auth.Token) (auth.Token, error) {
 	return token, nil
 }
 
-func ExtractTokenClaimString(e echo.Context, field string) string {
-	parsedToken, err := jwt.Parse(Token, func(token *jwt.Token) (interface{}, error) {
+func ExtractTokenMapClaim(e echo.Context, field string) any {
+	tokenString := e.Request().Header.Get("Authorization")
+	if tokenString == "" {
+		logrus.Error("Unauthorized JWT, because token not found.")
+	}
+	tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
+
+	parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(key), nil
 	})
 	if err != nil {
@@ -83,37 +86,7 @@ func ExtractTokenClaimString(e echo.Context, field string) string {
 		return ""
 	}
 	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		result := claims[field].(string)
-		return result
-	}
-	return ""
-}
-
-func ExtractTokenClaimBool(e echo.Context, field string) bool {
-	parsedToken, err := jwt.Parse(Token, func(token *jwt.Token) (interface{}, error) {
-		return []byte(key), nil
-	})
-	if err != nil {
-		logrus.Error("Error parsing token: ", err)
-		return false
-	}
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		result := claims[field].(bool)
-		return result
-	}
-	return false
-}
-
-func ExtractTokenClaimStringFromToken(e echo.Context, field string, token string) string {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte(key), nil
-	})
-	if err != nil {
-		logrus.Error("Error parsing token: ", err)
-		return ""
-	}
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		result := claims[field].(string)
+		result := claims[field]
 		return result
 	}
 	return ""
@@ -122,7 +95,7 @@ func ExtractTokenClaimStringFromToken(e echo.Context, field string, token string
 func ChangeTokenForLogout(c echo.Context) error {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
-		return errors.New("Unauthorized JWT")
+		return errors.New("unauthorized jwt, because token not found")
 	}
 
 	tokenString = strings.Replace(tokenString, "Bearer ", "", 1)

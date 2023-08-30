@@ -40,12 +40,12 @@ func (s *service) Create(inputData *book.CreateRequest, e echo.Context) (*book.C
 		return nil, "Error Validate input data, check required field", http.StatusBadRequest, errValidate
 	}
 
-	userId := middleware.ExtractTokenClaimString(e, "userId")
+	userId := middleware.ExtractTokenMapClaim(e, "userId")
 	if userId == "" {
 		return nil, "Error Claim user id from token, please login.", http.StatusForbidden, errors.New("error claim user id")
 	}
 
-	bookData, errFindByBookName := s.bookRepo.FindByBookNameAndUserId(*inputData.BookName, userId)
+	bookData, errFindByBookName := s.bookRepo.FindByBookNameAndUserId(*inputData.BookName, userId.(string))
 	if errFindByBookName != nil && errFindByBookName.Error() != "record not found" {
 		return nil, "Error query FindByBookName.", http.StatusInternalServerError, errFindByBookName
 	}
@@ -61,7 +61,7 @@ func (s *service) Create(inputData *book.CreateRequest, e echo.Context) (*book.C
 	data.BookName = *inputData.BookName
 	data.BookAuthor = *inputData.BookAuthor
 	data.BookPublisher = *inputData.BookPublisher
-	data.UserId = userId
+	data.UserId = userId.(string)
 	data.IsDelete = false
 	data.CreatedAt = *general.DateTodayLocal()
 	data.UpdatedAt = *general.DateTodayLocal()
@@ -201,7 +201,7 @@ func (s *service) GetAll(e echo.Context) (*book.GetAllResponse, string, int, err
 		return nil, "Error marshal data for save temporary redis", http.StatusInternalServerError, errMarshalData
 	}
 	dataRedisSave := fmt.Sprintf("Query Get All & Get Count with with data= %s \ncount= %d \nparam user_name= %s \nparam book_name= %s \nparam book_publisher= %s \nparam book_author= %s", string(dataResult), *count, queryParam["user_name"], queryParam["book_name"], queryParam["book_publisher"], queryParam["book_author"])
-	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 24*time.Hour).Err()
+	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 1*time.Hour).Err()
 	if errSaveDataRedis != nil {
 		return nil, "Error save temporary data to redis", http.StatusInternalServerError, errSaveDataRedis
 	}
@@ -233,12 +233,12 @@ func (s *service) Update(inputData *book.UpdateRequest, e echo.Context) (*book.U
 		return nil, "Error Validate input data, check required field", http.StatusBadRequest, errValidate
 	}
 
-	userId := middleware.ExtractTokenClaimString(e, "userId")
+	userId := middleware.ExtractTokenMapClaim(e, "userId")
 	if userId == "" {
 		return nil, "Error Claim user id from token, please login.", http.StatusForbidden, errors.New("error claim user id")
 	}
 
-	bookData, errFindByBookName := s.bookRepo.FindByBookNameAndUserId(*inputData.BookName, userId)
+	bookData, errFindByBookName := s.bookRepo.FindByBookNameAndUserId(*inputData.BookName, userId.(string))
 	if errFindByBookName != nil && errFindByBookName.Error() != "record not found" {
 		return nil, "Error query FindByBookName.", http.StatusInternalServerError, errFindByBookName
 	}
@@ -249,7 +249,7 @@ func (s *service) Update(inputData *book.UpdateRequest, e echo.Context) (*book.U
 		}
 	}
 
-	_, errGetDataBookUser := s.bookRepo.FindByBookIdAndUserId(inputData.Id, userId)
+	_, errGetDataBookUser := s.bookRepo.FindByBookIdAndUserId(inputData.Id, userId.(string))
 	if errGetDataBookUser != nil && errGetDataBookUser.Error() != "record not found" {
 		return nil, "Error query FinfByBookIdAndUserId", http.StatusInternalServerError, errGetDataBookUser
 	} else if errGetDataBookUser != nil && errGetDataBookUser.Error() == "record not found" {
@@ -281,12 +281,12 @@ func (s *service) Delete(inputData *book.DeleteRequest, e echo.Context) (*book.D
 		return nil, "Error Validate input data, check required field", http.StatusBadRequest, errValidate
 	}
 
-	userId := middleware.ExtractTokenClaimString(e, "userId")
+	userId := middleware.ExtractTokenMapClaim(e, "userId")
 	if userId == "" {
 		return nil, "Error Claim user id from token, please login.", http.StatusForbidden, errors.New("error claim user id")
 	}
 
-	_, errGetDataBookUser := s.bookRepo.FindByBookIdAndUserId(inputData.Id, userId)
+	_, errGetDataBookUser := s.bookRepo.FindByBookIdAndUserId(inputData.Id, userId.(string))
 	if errGetDataBookUser != nil && errGetDataBookUser.Error() != "record not found" {
 		return nil, "Error query FinfByBookIdAndUserId", http.StatusInternalServerError, errGetDataBookUser
 	} else if errGetDataBookUser != nil && errGetDataBookUser.Error() == "record not found" {

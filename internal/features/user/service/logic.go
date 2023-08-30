@@ -141,7 +141,7 @@ func (s *service) GetAll(e echo.Context) (*user.GetAllResponse, string, int, err
 		return nil, "Error marshal data for save temporary redis", http.StatusInternalServerError, errMarshalData
 	}
 	dataRedisSave := fmt.Sprintf("Query Get All & Get Count with data=%s \ncount= %d \nquery param=%s", string(dataResult), *count, queryParam["user_name"])
-	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 24*time.Hour).Err()
+	errSaveDataRedis := s.redis.Set(keyRedis, dataRedisSave, 1*time.Hour).Err()
 	if errSaveDataRedis != nil {
 		return nil, "Error save temporary data to redis", http.StatusInternalServerError, errSaveDataRedis
 	}
