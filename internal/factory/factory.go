@@ -34,6 +34,6 @@ func InitFactory(e *echo.Echo, db *gorm.DB, redis *redis.Client) {
 	rentServiceFactory := rentService.New(rentRepoFactory, redis)
 	rentDelivery.New(rentServiceFactory, e)
 
-	authServiceFactory := authService.New(userRepoFactory, redis)
+	authServiceFactory := authService.New(userRepoFactory, rentRepoFactory, redis)
 	authDelivery.New(authServiceFactory, e)
 }

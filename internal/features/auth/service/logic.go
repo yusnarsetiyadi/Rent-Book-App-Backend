@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"rentbook/internal/config"
 	"rentbook/internal/features/auth"
+	"rentbook/internal/features/rent"
 	"rentbook/internal/features/user"
 	"rentbook/internal/middleware"
 	"rentbook/utils/pkg/general"
@@ -19,15 +21,17 @@ import (
 
 type service struct {
 	userRepo user.RepositoryInterface
+	rentRepo rent.RepositoryInterface
 	validate *validator.Validate
 	redis    *redis.Client
 }
 
-func New(repoUser user.RepositoryInterface, Redis *redis.Client) auth.ServiceInterface {
+func New(repoUser user.RepositoryInterface, repoRent rent.RepositoryInterface, Redis *redis.Client) auth.ServiceInterface {
 	return &service{
 		userRepo: repoUser,
 		validate: vald.NewValidator(),
 		redis:    Redis,
+		rentRepo: repoRent,
 	}
 }
 
@@ -69,24 +73,47 @@ func (s *service) Login(inputData auth.LoginRequest, c echo.Context) (*auth.Logi
 		return nil, "Error, failed generate refresh token.", http.StatusInternalServerError, errRefreshToken
 	}
 
-	keyRedis := middleware.ExtractTokenMapClaim(c, "userId")
-	if keyRedis == "" {
-		return nil, "Error Claim redis key (user id) from token, please login.", http.StatusForbidden, errors.New("error claim user id")
-	}
 	timeCreated := general.DateTodayLocal().String()
 	dataRedisSave := fmt.Sprintf("Event Created for Login user=%s(id=%s) at %s", dataUser.UserEmail, dataUser.UserId, timeCreated)
-	_, errCreateEvent := s.redis.LPush(keyRedis.(string), dataRedisSave).Result()
+	_, errCreateEvent := s.redis.LPush(dataUser.UserId, dataRedisSave).Result()
 	if errCreateEvent != nil {
 		return nil, "Error save event data to redis", http.StatusInternalServerError, errCreateEvent
 	}
 	logrus.Info("Success Save Redis Event Data")
 
-	dataEventRedis, errGetEventRedis := s.redis.LRange(keyRedis.(string), 0, -1).Result()
+	dataEventRedis, errGetEventRedis := s.redis.LRange(dataUser.UserId, 0, -1).Result()
 	if errGetEventRedis != nil {
 		logrus.Error("Error Get Redis Event Data")
 	} else {
 		for _, event := range dataEventRedis {
 			logrus.Print("Redis Event Data: " + event)
+		}
+	}
+
+	queryParam := map[string]string{
+		"book_name":   "%" + c.QueryParam("book_name") + "%",
+		"user_name":   "%" + c.QueryParam("user_name") + "%",
+		"rent_status": "%" + c.QueryParam("rent_status") + "%",
+	}
+	rowRentOnUser, errGetRentByIdUser := s.rentRepo.GetAllByIdUser(dataUser.UserId, queryParam)
+	if errGetRentByIdUser != nil && errGetRentByIdUser.Error() != "record not found" {
+		return nil, "Error get row rent data by user id", http.StatusInternalServerError, errGetRentByIdUser
+	}
+	if rowRentOnUser != nil {
+		for _, rowRent := range *rowRentOnUser {
+			var dataRent = new(rent.Rents)
+			if general.DateTodayLocal().Before(rowRent.RentStartDate) {
+				dataRent.RentStatus = config.RENT_PENDING
+			} else if general.DateTodayLocal().After(rowRent.RentStartDate) && general.DateTodayLocal().Before(rowRent.RentEndDate) {
+				dataRent.RentStatus = config.RENT_ACTIVE
+			} else if general.DateTodayLocal().After(rowRent.RentEndDate) {
+				dataRent.RentStatus = config.RENT_EXPIRED
+			}
+			dataRent.UpdatedAt = *general.DateTodayLocal()
+			_, errUpdateRent := s.rentRepo.Update(dataRent, rowRent.RentId)
+			if errUpdateRent != nil {
+				return nil, "Error query UpdateRent", http.StatusInternalServerError, errUpdateRent
+			}
 		}
 	}
 

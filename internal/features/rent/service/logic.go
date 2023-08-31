@@ -267,9 +267,9 @@ func (s *service) Update(inputData *rent.UpdateRequest, e echo.Context) (*rent.U
 	}
 	data.UpdatedAt = *general.DateTodayLocal()
 
-	_, errUpdateBook := s.rentRepo.Update(data, inputData.Id)
-	if errUpdateBook != nil {
-		return nil, "Error query UpdateRent", http.StatusInternalServerError, errUpdateBook
+	_, errUpdateRent := s.rentRepo.Update(data, inputData.Id)
+	if errUpdateRent != nil {
+		return nil, "Error query UpdateRent", http.StatusInternalServerError, errUpdateRent
 	}
 
 	result = rent.UpdateResponse{

@@ -1,0 +1,7 @@
+login testing rent-book-app-backend
+
+yusnar@mailsac.com
+fikri@mailsac.com
+ahmad@mailsac.com
+
+password: test12345
