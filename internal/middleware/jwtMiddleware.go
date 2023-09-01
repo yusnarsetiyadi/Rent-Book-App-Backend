@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
+	"net/http"
 	"rentbook/internal/config"
 	"rentbook/internal/features/auth"
 	"strings"
@@ -29,6 +30,15 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	return middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningMethod: "HS256",
 		SigningKey:    []byte(key),
+		ErrorHandler: func(err error) error {
+			if err == middleware.ErrJWTMissing {
+				return echo.NewHTTPError(http.StatusBadRequest, "missing or malformed jwt")
+			}
+			if _, ok := err.(*jwt.ValidationError); ok {
+				return echo.NewHTTPError(http.StatusUnauthorized, "invalid or expired jwt")
+			}
+			return err
+		},
 	})
 }
 
@@ -39,7 +49,7 @@ func GenerateAccessToken(user *auth.Auth) (string, error) {
 		"userName":   user.UserName,
 		"userEmail":  user.UserEmail,
 		"isDelete":   user.IsDelete,
-		"exp":        time.Now().Add(time.Hour * 48).Unix(),
+		"exp":        time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(key))
@@ -110,6 +120,7 @@ func ChangeTokenForLogout(c echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = time.Now().Unix()
 	token.Claims = claims
+	token.Valid = false
 
 	newTokenString, errSignedString := token.SignedString([]byte(key))
 	if errSignedString != nil {
