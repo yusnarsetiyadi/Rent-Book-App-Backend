@@ -1,6 +1,6 @@
 <div align="center">
    <a href="https://github.com/yusnarsetiyadi/Rent-Book-App-Backend">
-    <img src="https://github.com/yusnarsetiyadi/Rent-Book-App-Backend/assets/116538882/2b7d8049-ac2c-4443-94ff-16d64e885836" alt="Logo" width="300px">
+    <img src="https://hybrid.co.id/wp-content/uploads/2021/01/d5bc5153c178366849bff92f6e6aa124_Logo-1.png" alt="Logo" width="300px">
   </a>
 </div>
 
