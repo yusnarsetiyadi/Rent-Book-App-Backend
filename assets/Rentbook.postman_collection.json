@@ -1,0 +1,687 @@
+{
+	"info": {
+		"_postman_id": "e83167e0-afdb-406d-b72d-b542390d21fb",
+		"name": "Rentbook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24530448"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_name",
+									"value": "fikri",
+									"type": "text"
+								},
+								{
+									"key": "user_email",
+									"value": "fikri@mailsac.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/users/e3ca1569-0da5-4e67-aae5-64c70a9d5115",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"e3ca1569-0da5-4e67-aae5-64c70a9d5115"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All & Get Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/users?user_name=",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "user_name",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_name",
+									"value": "yusnar setiyadi - update",
+									"type": "text"
+								},
+								{
+									"key": "user_email",
+									"value": "yusnarsetiyadi1504@mailsac.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/users/e840a138-e2d9-4275-9676-20544861f2dd",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"e840a138-e2d9-4275-9676-20544861f2dd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/users/364c6a47-58ca-4c75-b53e-82cda3b4e2ff",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"364c6a47-58ca-4c75-b53e-82cda3b4e2ff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "old_password",
+									"value": "JEuC@dv%7J",
+									"type": "text"
+								},
+								{
+									"key": "new_password",
+									"value": "test12345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/users/change_password/0e2b13a3-70d7-4f78-beeb-2e223b2dfdea",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"change_password",
+								"0e2b13a3-70d7-4f78-beeb-2e223b2dfdea"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_email",
+									"value": "yusnar@mailsac.com",
+									"type": "text"
+								},
+								{
+									"key": "user_password",
+									"value": "test12345",
+									"type": "text"
+								},
+								{
+									"key": "user_email",
+									"value": "susyanti2703@mailsac.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "user_password",
+									"value": "new_password",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/auth/logout",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Book",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "book_name",
+									"value": "NodeJs Programming part1",
+									"type": "text"
+								},
+								{
+									"key": "book_publisher",
+									"value": "Gramedia",
+									"type": "text"
+								},
+								{
+									"key": "book_author",
+									"value": "rudolf",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/books",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetByIdBook",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/books/book_id/c9840747-6986-446a-8109-8d90c440ce61",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books",
+								"book_id",
+								"c9840747-6986-446a-8109-8d90c440ce61"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllByIdUser & GetCountByIdUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/books/user_id/03cca342-7d84-4e7b-b6a2-1ccfffeb8cc3?book_name=&user_name&book_publisher&book_author",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books",
+								"user_id",
+								"03cca342-7d84-4e7b-b6a2-1ccfffeb8cc3"
+							],
+							"query": [
+								{
+									"key": "book_name",
+									"value": ""
+								},
+								{
+									"key": "user_name",
+									"value": null
+								},
+								{
+									"key": "book_publisher",
+									"value": null
+								},
+								{
+									"key": "book_author",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAll & GetCount",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/books?book_publisher=&book_author&book_name&user_name",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books"
+							],
+							"query": [
+								{
+									"key": "book_publisher",
+									"value": ""
+								},
+								{
+									"key": "book_author",
+									"value": null
+								},
+								{
+									"key": "book_name",
+									"value": null
+								},
+								{
+									"key": "user_name",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "book_name",
+									"value": "C++ Programming part 10",
+									"type": "text"
+								},
+								{
+									"key": "book_publisher",
+									"value": "Bogor Publisher",
+									"type": "text"
+								},
+								{
+									"key": "book_author",
+									"value": "yusnar",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/books/a06da158-e815-4727-9c5c-e42b9749b517",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books",
+								"a06da158-e815-4727-9c5c-e42b9749b517"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/books/a06da158-e815-4727-9c5c-e42b9749b517",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"books",
+								"a06da158-e815-4727-9c5c-e42b9749b517"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rent",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "book_id",
+									"value": "792ce93a-67ee-4b4d-a8ca-f0a7c92fb286",
+									"type": "text"
+								},
+								{
+									"key": "rent_start_date",
+									"value": "2023-08-29 05:30:10",
+									"type": "text"
+								},
+								{
+									"key": "rent_end_date",
+									"value": "2023-08-30 23:01:10",
+									"type": "text"
+								},
+								{
+									"key": "rent_qty",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/rents",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/rents/fb19dbf3-264c-4d9d-b5d9-2d52c8652ce5",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents",
+								"fb19dbf3-264c-4d9d-b5d9-2d52c8652ce5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllByIdUser & GetCountByIdUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/rents/user_id/b7e152f9-dd93-43a9-bb86-c933599d3e6b?user_name&book_name&rent_status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents",
+								"user_id",
+								"b7e152f9-dd93-43a9-bb86-c933599d3e6b"
+							],
+							"query": [
+								{
+									"key": "user_name",
+									"value": null
+								},
+								{
+									"key": "book_name",
+									"value": null
+								},
+								{
+									"key": "rent_status",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllByIdBook & GetCountByIdBook",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/rents/book_id/7fa53d71-416b-41b1-9dd4-b22e846bf254?user_name&book_name&rent_status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents",
+								"book_id",
+								"7fa53d71-416b-41b1-9dd4-b22e846bf254"
+							],
+							"query": [
+								{
+									"key": "user_name",
+									"value": null
+								},
+								{
+									"key": "book_name",
+									"value": null
+								},
+								{
+									"key": "rent_status",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "rent_start_date",
+									"value": "2023-09-10 21:00:10",
+									"type": "text"
+								},
+								{
+									"key": "rent_end_date",
+									"value": "2023-09-14 21:00:10",
+									"type": "text"
+								},
+								{
+									"key": "rent_qty",
+									"value": "5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/rents/fb19dbf3-264c-4d9d-b5d9-2d52c8652ce5",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents",
+								"fb19dbf3-264c-4d9d-b5d9-2d52c8652ce5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/rents/33434373-a93f-4919-845c-1a6fdeb98d1e",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"rents",
+								"33434373-a93f-4919-845c-1a6fdeb98d1e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2OTM2MTA5MzMsImlzRGVsZXRlIjpmYWxzZSwidXNlckVtYWlsIjoiYWhtYWRAbWFpbHNhYy5jb20iLCJ1c2VySWQiOiI2ZWE3OWQyOC03ZTcwLTRhZDktYTQ5Yi05NTZjMzdlNWNlMjYiLCJ1c2VyTmFtZSI6ImFobWFkIn0.KNRGyjPrtmR0NH0hW15kFjPHS3ch4TCWYDy89bBo-qo",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
